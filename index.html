@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حكاية - منصة القصص العربية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <button class="theme-toggle" aria-label="تبديل الوضع الليلي" title="تبديل الوضع الليلي">
+                <i class="fas fa-sun"></i>
+            </button>
+        </div>
+
+        <div class="nav-center">
+            <button class="nav-item" data-action="home" title="الرئيسية">
+                <i class="fas fa-home"></i>
+                <span>الرئيسية</span>
+            </button>
+            <button class="nav-item" data-action="best" title="أفضل القصص">
+                <i class="fas fa-star"></i>
+                <span>أفضل القصص</span>
+            </button>
+            <button class="nav-item" data-action="support" title="الدعم الفني">
+                <i class="fas fa-headset"></i>
+                <span>الدعم الفني</span>
+            </button>
+        </div>
+
+        <div class="nav-right">
+            <!-- Auth buttons will be added here by JavaScript -->
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Logo Section -->
+        <section class="logo-section">
+            <h1 class="logo">حكاية</h1>
+        </section>
+
+        <!-- Search Bar -->
+        <section class="search-section">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-bar" 
+                    placeholder="ابحث عن القصصك المفضلة..."
+                    aria-label="البحث عن القصص"
+                >
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </section>
+
+        <!-- Stories Grid Section -->
+        <section class="stories-section">
+            <h2 class="section-title">قصص مميزة</h2>
+            <div class="stories-grid">
+                <!-- Stories will be loaded here by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 موقع حكاية. جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbWJ_75F3RLUIBVRz2NpgpgLJKm0o1Jm8",
+            authDomain: "my-web-6111b.firebaseapp.com",
+            projectId: "my-web-6111b",
+            storageBucket: "my-web-6111b.firebasestorage.app",
+            messagingSenderId: "540400864980",
+            appId: "1:540400864980:web:df73e331638a07b2977541",
+            measurementId: "G-7729MX6D3Q"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+    <script type="module" src="./script.js"></script>
+</body>
+</html>
