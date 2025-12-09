@@ -1,275 +1,370 @@
-// Main Script - UI, Dark Mode, Auth Protection, and Card Effects
-import { checkAuth, logoutUser, onAuthStateChange, getCurrentUser } from "./auth.js";
+/* ============================================
+   Sample Stories Data
+   (EASY TO EDIT - Modify titles, images, and descriptions here)
+   ============================================ */
 
-// ============================================
-// Initialize App on Page Load
-// ============================================
-
-document.addEventListener('DOMContentLoaded', async () => {
-    initThemeToggle();
-    loadStoredTheme();
-    setupSearch();
-    
-    // Check if this is a protected page
-    if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
-        await protectAuthPage();
+const stories = [
+    {
+        id: 1,
+        title: "آخر المغامرات",
+        
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=آخر+المغامرات",
+        description: "قصة مثيرة عن الاستكشاف والاكتشاف. انضم إلى بطلنا في رحلة ملحمية عبر الجبال والوديان، حيث يحمل كل خطوة عجائب وتحديات جديدة. اختبر جمال الطبيعة وقوة الروح الإنسانية."
+    },
+    {
+        id: 2,
+        title: "همسات في الظلام",
+        
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=همسات+في+الظلام",
+        description: "قصة غامضة تتكشف في الظلال. اتبع البطل وهو يكتشف الأسرار المخفية في الظلام. الغموض والتشويق ينتظران في كل زاوية من هذه القصة الرائعة."
+    },
+    {
+        id: 3,
+        title: "حب عبر الحدود",
+       
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=حب+عبر+الحدود",
+        description: "قصة حب جميلة تتجاوز الحدود الجغرافية. نفسان من عالمين مختلفين يلتقيان ويكتشفان أن الحب لا يعرف حدوداً. قصة خالدة عن التواصل والتفاني."
+    },
+    {
+        id: 4,
+        title: "المدينة المفقودة",
+        
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=المدينة+المفقودة",
+        description: "مغامرة أثرية في حضارة منسية. يكتشف الآثاريون بقايا مدينة أسطورية ويفك لغز أسرارها القديمة. التاريخ يعود للحياة في هذه الرحلة المثيرة."
+    },
+    {
+        id: 5,
+        title: "سر المحيط",
+        
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=سر+المحيط",
+        description: "اغوص عميقاً في أسرار المحيط. اكتشف ما يكمن تحت الأمواج في هذه المغامرة الساحرة تحت الماء. عالم من العجائب ينتظر في أعماق البحر."
+    },
+    {
+        id: 6,
+        title: "الغموض في منتصف الليل",
+        
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=الغموض+في+منتصف",
+        description: "قصة مشبوهة تتكشف عندما يحل الظلام. العمل الاستقصائي والأدلة المخفية والمنعطفات غير المتوقعة. حل اللغز قبل أن ينقضي منتصف الليل."
+    },
+    {
+        id: 7,
+        title: "بين النجوم",
+       
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=بين+النجوم",
+        description: "رحلة كونية إلى المجرات البعيدة. انضم إلى رواد الفضاء في رحلتهم خارج نظامنا الشمسي. الخيال العلمي يلتقي بالعجائب في هذه الرحلة النجمية."
+    },
+    {
+        id: 8,
+        title: "الصرخة الصامتة",
+       
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=الصرخة+الصامتة",
+        description: "إثارة نفسية مرعبة. عندما يصبح الصمت مرعباً، الأسرار تهدد بتدمير كل شيء. قصة مقلقة ستحافظ على استيقاظك في الليل."
+    },
+    {
+        id: 9,
+        title: "أحلام الغد",
+       
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=أحلام+الغد",
+        description: "قصة مرهونة عن الأحلام والطموحات. تابع الشخصيات وهي تسعى لتحقيق أعمق رغباتها وتتغلب على العقبات. الأمل والعزم يتألقان في هذه القصة المرفوعة."
+    },
+    {
+        id: 10,
+        title: "صدى الأمس",
+        
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=صدى+الأمس",
+        description: "رحلة حنينية عبر الزمن والذاكرة. الألحان والحزن يتشابكان حيث يعود الماضي ليزور الحاضر. استكشاف حزين للحب والفقدان."
+    },
+    {
+        id: 11,
+        title: "الغابة المسحورة",
+        
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=الغابة+المسحورة",
+        description: "ادخل إلى عالم سحري حيث تحيا الطبيعة. السحر والعجائب تملأ كل زاوية من هذه الغابة الغامضة. قصة خيالية للعصر الحديث."
+    },
+    {
+        id: 12,
+        title: "أسرار القلب",
+        
+        image: "https://via.placeholder.com/400x300/87ceeb/ffffff?text=أسرار+القلب",
+        description: "استكشاف طري للعواطف الإنسانية والعلاقات. اكتشف الأعماق المخفية للقلب الإنساني. الحب والفقدان والشفاء تتحد في هذه الرواية المؤثرة."
     }
-    
-    // Update nav based on auth status
-    setupAuthUI();
+];
+
+/* ============================================
+   DOM Elements
+   ============================================ */
+
+const themeToggle = document.getElementById('themeToggle');
+const userFormModal = document.getElementById('userFormModal');
+const userGreeting = document.getElementById('userGreeting');
+const userName = document.getElementById('userName');
+const userAge = document.getElementById('userAge');
+const greetingText = document.getElementById('greetingText');
+const storiesGrid = document.getElementById('storiesGrid');
+const searchInput = document.getElementById('searchInput');
+const homePage = document.getElementById('homePage');
+const storyPage = document.getElementById('storyPage');
+const navButtons = document.querySelectorAll('.nav-btn');
+
+let currentUser = null;
+let filteredStories = [...stories];
+
+/* ============================================
+   Initialize App
+   ============================================ */
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initUser();
+    loadStories();
+    setupSearch();
+    setupNavigation();
 });
 
-// ============================================
-// Theme Toggle (Light/Dark Mode)
-// ============================================
+/* ============================================
+   Theme Toggle
+   ============================================ */
 
-function initThemeToggle() {
-    const themeToggle = document.querySelector('.theme-toggle');
-    if (!themeToggle) return;
+function initTheme() {
+    // Check if dark mode was previously saved
+    const isDark = localStorage.getItem('hikayaDarkMode') === 'true';
+    
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+        updateThemeIcon();
+    }
 
+    // Theme toggle click handler
     themeToggle.addEventListener('click', () => {
-        const isDarkMode = document.body.classList.toggle('dark-mode');
-        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('hikayaDarkMode', isDarkMode);
         updateThemeIcon();
     });
 }
 
-function loadStoredTheme() {
-    const theme = localStorage.getItem('theme') || 'light';
-    if (theme === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-    updateThemeIcon();
-}
-
 function updateThemeIcon() {
-    const themeToggle = document.querySelector('.theme-toggle');
-    if (!themeToggle) return;
-
     const icon = themeToggle.querySelector('i');
-    const isDark = document.body.classList.contains('dark-mode');
-
-    if (isDark) {
+    if (document.body.classList.contains('dark-mode')) {
         icon.className = 'fas fa-moon';
     } else {
         icon.className = 'fas fa-sun';
     }
 }
 
-// ============================================
-// Auth Page Protection
-// ============================================
+/* ============================================
+   User Management
+   ============================================ */
 
-async function protectAuthPage() {
-    const user = await checkAuth();
+function initUser() {
+    // Check if user data exists in localStorage
+    const savedUser = localStorage.getItem('hikayaUser');
     
-    if (!user) {
-        // User not logged in, redirect to login
-        window.location.href = './login.html';
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+            showUserGreeting();
+            hideUserForm();
+        } catch (e) {
+            showUserForm();
+        }
+    } else {
+        showUserForm();
+    }
+}
+
+function submitUserInfo() {
+    const name = userName.value.trim();
+    const age = userAge.value.trim();
+    const errorDiv = document.getElementById('formError');
+
+    // Validation
+    if (!name) {
+        errorDiv.textContent = 'يرجى إدخال اسمك';
+        errorDiv.classList.add('show');
         return;
     }
 
-    // User is logged in, allow access
-    loadStories();
+    if (!age || age < 1 || age > 150) {
+        errorDiv.textContent = 'يرجى إدخال عمر صحيح';
+        errorDiv.classList.add('show');
+        return;
+    }
+
+    // Save user data to localStorage
+    currentUser = { name, age };
+    localStorage.setItem('hikayaUser', JSON.stringify(currentUser));
+
+    // Update UI
+    hideUserForm();
+    showUserGreeting();
+
+    // Clear form
+    userName.value = '';
+    userAge.value = '';
+    errorDiv.classList.remove('show');
 }
 
-// ============================================
-// Setup Auth UI (Navbar)
-// ============================================
-
-function setupAuthUI() {
-    onAuthStateChange((user) => {
-        const navRight = document.querySelector('.nav-right');
-        if (!navRight) return;
-
-        navRight.innerHTML = '';
-
-        if (user) {
-            // User is logged in - show logout button
-            const logoutBtn = document.createElement('button');
-            logoutBtn.className = 'auth-button logout';
-            logoutBtn.textContent = 'تسجيل الخروج';
-            logoutBtn.addEventListener('click', handleLogout);
-            navRight.appendChild(logoutBtn);
-        } else {
-            // User is not logged in - show login and register buttons
-            const loginBtn = document.createElement('button');
-            loginBtn.className = 'auth-button';
-            loginBtn.textContent = 'تسجيل الدخول';
-            loginBtn.addEventListener('click', () => {
-                window.location.href = './login.html';
-            });
-
-            const registerBtn = document.createElement('button');
-            registerBtn.className = 'auth-button';
-            registerBtn.textContent = 'إنشاء حساب';
-            registerBtn.addEventListener('click', () => {
-                window.location.href = './register.html';
-            });
-
-            navRight.appendChild(loginBtn);
-            navRight.appendChild(registerBtn);
-        }
-    });
+function showUserForm() {
+    userFormModal.classList.remove('hidden');
+    userGreeting.classList.add('hidden');
 }
 
-// ============================================
-// Logout Handler
-// ============================================
+function hideUserForm() {
+    userFormModal.classList.add('hidden');
+}
 
-async function handleLogout() {
-    const result = await logoutUser();
-    if (result.success) {
-        window.location.href = './login.html';
+function showUserGreeting() {
+    userGreeting.classList.remove('hidden');
+    if (currentUser) {
+        greetingText.textContent = `هلا بالشيخ ${currentUser.name}!`;
     }
 }
 
-// ============================================
-// Search Functionality
-// ============================================
-
-function setupSearch() {
-    const searchBar = document.querySelector('.search-bar');
-    if (!searchBar) return;
-
-    searchBar.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const cards = document.querySelectorAll('.story-card');
-
-        cards.forEach(card => {
-            const title = card.querySelector('.story-title')?.textContent.toLowerCase() || '';
-            const author = card.querySelector('.story-author')?.textContent.toLowerCase() || '';
-
-            if (title.includes(query) || author.includes(query)) {
-                card.style.display = '';
-                card.style.animation = 'fadeIn 0.3s ease forwards';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    });
+function resetUser() {
+    // Remove user data from localStorage
+    localStorage.removeItem('hikayaUser');
+    currentUser = null;
+    
+    // Reset UI
+    userGreeting.classList.add('hidden');
+    showUserForm();
+    userName.focus();
 }
 
-// ============================================
-// Load and Display Stories
-// ============================================
+/* ============================================
+   Stories Functions
+   ============================================ */
 
-function loadStories() {
-    const storiesGrid = document.querySelector('.stories-grid');
-    if (!storiesGrid) return;
+function loadStories(storiesToDisplay = stories) {
+    storiesGrid.innerHTML = '';
 
-    // Sample stories data - you can replace with API call
-    const stories = [
-        {
-            title: 'رحلة الحلم',
-            author: 'أحمد علي',
-            price: '49 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=رحلة+الحلم'
-        },
-        {
-            title: 'في قلب المدينة',
-            author: 'فاطمة محمود',
-            price: '39 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=في+قلب+المدينة'
-        },
-        {
-            title: 'صوت الهمس',
-            author: 'محمد سعيد',
-            price: '45 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=صوت+الهمس'
-        },
-        {
-            title: 'نجوم الليل',
-            author: 'ليلى جاد',
-            price: '55 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=نجوم+الليل'
-        },
-        {
-            title: 'أسرار البحر',
-            author: 'سارة خليل',
-            price: '50 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=أسرار+البحر'
-        },
-        {
-            title: 'عبور الجسر',
-            author: 'علي إبراهيم',
-            price: '42 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=عبور+الجسر'
-        },
-        {
-            title: 'ضوء القمر',
-            author: 'نور عبدالله',
-            price: '48 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=ضوء+القمر'
-        },
-        {
-            title: 'خطوات الأمل',
-            author: 'هناء عمر',
-            price: '44 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=خطوات+الأمل'
-        },
-        {
-            title: 'رسائل العشق',
-            author: 'ياسمين أحمد',
-            price: '52 ريال',
-            image: 'https://via.placeholder.com/300x220/87ceeb/ffffff?text=رسائل+العشق'
-        }
-    ];
-
-    storiesGrid.innerHTML = stories.map(story => `
-        <div class="story-card">
-            <div class="story-image-container">
-                <img src="${story.image}" alt="${story.title}" class="story-image" onerror="this.src='https://via.placeholder.com/300x220/87ceeb/ffffff?text=صورة'">
+    storiesToDisplay.forEach((story) => {
+        const storyCard = document.createElement('div');
+        storyCard.className = 'story-card';
+        storyCard.innerHTML = `
+            <div class="story-image">
+                ${story.emoji}
             </div>
             <div class="story-content">
                 <h3 class="story-title">${story.title}</h3>
-                <p class="story-author">${story.author}</p>
-                <p class="story-price">${story.price}</p>
             </div>
-        </div>
-    `).join('');
+        `;
 
-    // Add click handlers to cards
-    document.querySelectorAll('.story-card').forEach(card => {
-        card.addEventListener('click', () => {
-            console.log('Story clicked:', card.querySelector('.story-title').textContent);
-            // You can add navigation logic here
+        storyCard.addEventListener('click', () => {
+            viewStory(story.id);
         });
+
+        storiesGrid.appendChild(storyCard);
     });
 }
 
-// ============================================
-// Navigation Items Handler
-// ============================================
+function viewStory(storyId) {
+    const story = stories.find(s => s.id === storyId);
+    
+    if (story) {
+        // Update story detail page
+        document.getElementById('storyDetailImage').src = story.image;
+        document.getElementById('storyDetailImage').alt = story.title;
+        document.getElementById('storyDetailTitle').textContent = story.title;
+        document.getElementById('storyDetailDescription').textContent = story.description;
+
+        // Switch pages
+        homePage.classList.remove('active');
+        storyPage.classList.add('active');
+
+        // Scroll to top
+        window.scrollTo(0, 0);
+    }
+}
+
+function goHome() {
+    storyPage.classList.remove('active');
+    homePage.classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+function readStory() {
+    alert('عارض محتوى القصة قادم قريباً!');
+}
+
+/* ============================================
+   Search Functionality
+   ============================================ */
+
+function setupSearch() {
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+
+        if (searchTerm === '') {
+            filteredStories = [...stories];
+        } else {
+            filteredStories = stories.filter(story =>
+                story.title.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        loadStories(filteredStories);
+    });
+}
+
+/* ============================================
+   Navigation
+   ============================================ */
 
 function setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const action = this.dataset.action;
-            
-            if (action === 'home') {
-                window.location.href = './index.html';
-            } else if (action === 'best') {
-                filterBestStories();
-            } else if (action === 'support') {
-                showAlert('خدمة الدعم الفني قريباً');
-            }
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            navButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         });
     });
 }
 
-function filterBestStories() {
-    showAlert('جاري تحميل أفضل القصص...');
+function goToPage(page) {
+    switch (page) {
+        case 'home':
+            loadStories(stories);
+            filteredStories = [...stories];
+            searchInput.value = '';
+            console.log('الرئيسية');
+            break;
+        case 'best':
+            const bestStories = stories.slice(0, 6);
+            loadStories(bestStories);
+            console.log('أفضل القصص');
+            break;
+        case 'support':
+            alert('صفحة الدعم الفني قريباً...');
+            console.log('الدعم الفني');
+            break;
+        default:
+            console.log('صفحة غير معروفة');
+    }
 }
 
-function showAlert(message) {
-    alert(message);
-}
+/* ============================================
+   Utility Functions
+   ============================================ */
 
-// ============================================
-// Initialize Navigation on Page Load
-// ============================================
+// Smooth scroll to top on page load
+window.addEventListener('load', () => {
+    window.scrollTo(0, 0);
+});
 
-setupNavigation();
+// Add event listeners for keyboard shortcuts (optional)
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        searchInput.value = '';
+        loadStories(stories);
+    }
+});
+
+// Handle Enter key in form
+userName.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') userAge.focus();
+});
+
+userAge.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') submitUserInfo();
+});

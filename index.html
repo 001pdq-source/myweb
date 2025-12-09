@@ -5,90 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>حكاية - منصة القصص العربية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Top Navigation Bar -->
-    <nav class="top-nav">
-        <div class="nav-left">
-            <button class="theme-toggle" aria-label="تبديل الوضع الليلي" title="تبديل الوضع الليلي">
-                <i class="fas fa-sun"></i>
-            </button>
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle" class="theme-toggle" title="تبديل الوضع الليلي">
+        <i class="fas fa-sun"></i>
+    </button>
+
+    <!-- User Greeting -->
+    <div id="userGreeting" class="user-greeting hidden">
+        <span id="greetingText">أهلا بك!</span>
+        <button class="btn-change-user" onclick="resetUser()" title="تبديل المستخدم">
+            <i class="fas fa-user-circle"></i>
+        </button>
+    </div>
+
+    <!-- User Form Modal -->
+    <div id="userFormModal" class="user-form-modal">
+        <div class="form-container">
+            <h2>أهلا بك في حكاية</h2>
+            <p>يرجى إدخال اسمك وعمرك</p>
+            <form onsubmit="event.preventDefault(); submitUserInfo();">
+                <div class="form-group">
+                    <input type="text" id="userName" placeholder="اسمك" maxlength="50" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="userAge" placeholder="عمرك" min="1" max="150" required>
+                </div>
+                <div id="formError" class="form-error"></div>
+                <button type="submit" class="btn-submit">ابدأ القراءة</button>
+            </form>
         </div>
+    </div>
 
-        <div class="nav-center">
-            <button class="nav-item" data-action="home" title="الرئيسية">
-                <i class="fas fa-home"></i>
-                <span>الرئيسية</span>
-            </button>
-            <button class="nav-item" data-action="best" title="أفضل القصص">
-                <i class="fas fa-star"></i>
-                <span>أفضل القصص</span>
-            </button>
-            <button class="nav-item" data-action="support" title="الدعم الفني">
-                <i class="fas fa-headset"></i>
-                <span>الدعم الفني</span>
-            </button>
-        </div>
-
-        <div class="nav-right">
-            <!-- Auth buttons will be added here by JavaScript -->
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Logo Section -->
-        <section class="logo-section">
-            <h1 class="logo">حكاية</h1>
-        </section>
-
-        <!-- Search Bar -->
-        <section class="search-section">
-            <div class="search-container">
-                <input 
-                    type="text" 
-                    class="search-bar" 
-                    placeholder="ابحث عن القصصك المفضلة..."
-                    aria-label="البحث عن القصص"
-                >
-                <i class="fas fa-search search-icon"></i>
+    <!-- Main Home Page -->
+    <div id="homePage" class="page active">
+        <div class="container">
+            <!-- Logo -->
+            <div class="logo-section">
+                <h1 class="logo">حكاية</h1>
             </div>
-        </section>
 
-        <!-- Stories Grid Section -->
-        <section class="stories-section">
-            <h2 class="section-title">قصص مميزة</h2>
-            <div class="stories-grid">
-                <!-- Stories will be loaded here by JavaScript -->
+            <!-- Search Bar -->
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="ابحث عن قصة..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
             </div>
-        </section>
-    </main>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 موقع حكاية. جميع الحقوق محفوظة.</p>
-    </footer>
+            <!-- Navigation Menu -->
+            <nav class="navbar">
+                <button class="nav-btn nav-left" onclick="goToPage('support')">
+                    <i class="fas fa-headset"></i> الدعم الفني
+                </button>
+                <button class="nav-btn nav-center active" onclick="goToPage('home')">
+                    <i class="fas fa-home"></i> الرئيسية
+                </button>
+                <button class="nav-btn nav-right" onclick="goToPage('best')">
+                    <i class="fas fa-star"></i> أفضل القصص
+                </button>
+            </nav>
 
-    <!-- Scripts -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+            <!-- Stories Section -->
+            <div class="stories-section">
+                <h2 class="section-title">قصص مميزة</h2>
+                <div class="stories-grid" id="storiesGrid">
+                    <!-- Stories will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAbWJ_75F3RLUIBVRz2NpgpgLJKm0o1Jm8",
-            authDomain: "my-web-6111b.firebaseapp.com",
-            projectId: "my-web-6111b",
-            storageBucket: "my-web-6111b.firebasestorage.app",
-            messagingSenderId: "540400864980",
-            appId: "1:540400864980:web:df73e331638a07b2977541",
-            measurementId: "G-7729MX6D3Q"
-        };
+    <!-- Story Detail Page -->
+    <div id="storyPage" class="page">
+        <button class="btn-back" onclick="goHome()">
+            <i class="fas fa-arrow-left"></i> العودة
+        </button>
+        <div class="container story-detail-container">
+            <div class="story-detail">
+                <img id="storyDetailImage" src="" alt="غلاف القصة" class="story-detail-image">
+                <div class="story-detail-content">
+                    <h1 id="storyDetailTitle">عنوان القصة</h1>
+                    <p id="storyDetailDescription">وصف القصة</p>
+                    <button class="btn-read" onclick="readStory()">
+                        <i class="fas fa-book"></i> اقرأ القصة كاملة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-    </script>
-    <script type="module" src="./script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
